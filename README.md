@@ -1,6 +1,6 @@
-Tension Control Test
+/#Tension Control Test
 tension Control Test เป็นเกมทดสอบการควบคุมเสถียรภาพแบบแนวนอน ผู้เล่นต้องควบคุม marker ให้อยู่ใกล้จุดศูนย์กลางของบาร์ให้มากที่สุด ระหว่างที่ระบบสร้างแรงรบกวนหลายรูปแบบเข้ามา
-
+```text
 เป้าหมายหลักของเกมคือ:
 
 No matter what happens, pull the marker back to the center.
@@ -17,7 +17,7 @@ marker จะถูกแรงรบกวนจากระบบดันอ�
 Controls:
 
 Pull Left [←] [→] Pull Right
-
+```
 Core Physics
 ระบบฟิสิกส์ของเกมใช้แนวคิดง่าย ๆ คือรวมแรงจากผู้เล่นกับแรงรบกวนของระบบ
 
