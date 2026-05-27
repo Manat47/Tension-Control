@@ -24,15 +24,31 @@ const BASE_PLAYER_FORCE = 300;
 const BASE_MAX_VELOCITY = 220;
 
 const introPatterns = [
-  ["Kick", "A hard kick throws the marker out. The rail turns heavy, so hold long to recover."],
-  ["Constant Pull", "A clear one-way pull keeps dragging the marker. Hold against it and manage overshoot."],
-  ["Wave Pull", "A strong wave sweeps the marker left and right beyond the safe center."],
+  [
+    "Kick",
+    "A hard kick throws the marker out. The rail turns heavy, so hold long to recover.",
+  ],
+  [
+    "Constant Pull",
+    "A clear one-way pull keeps dragging the marker. Hold against it and manage overshoot.",
+  ],
+  [
+    "Wave Pull",
+    "A strong wave sweeps the marker left and right beyond the safe center.",
+  ],
   ["Slippery", "Controls are hyper-sensitive. Tiny inputs cause big movement."],
-  ["Momentum", "Inertia: once moving, hard to stop. Brake with the opposite key."],
-  ["Wind Burst", "Strong wind gusts arrive in visible waves. Recover between each gust."],
+  [
+    "Momentum",
+    "Inertia: once moving, hard to stop. Brake with the opposite key.",
+  ],
+  [
+    "Wind Burst",
+    "Strong wind gusts arrive in visible waves. Recover between each gust.",
+  ],
 ];
 
-const formatPercent = (value: number) => `${Math.max(0, Math.min(100, value)).toFixed(1)}%`;
+const formatPercent = (value: number) =>
+  `${Math.max(0, Math.min(100, value)).toFixed(1)}%`;
 const formatNumber = (value: number) => value.toFixed(1);
 const formatRecovery = (value: number | null) =>
   value === null ? "N/A" : `${Math.round(value)} ms`;
@@ -56,7 +72,7 @@ const getScoreTone = (score: number) => {
 export function TensionControlGame() {
   const [phase, setPhase] = useState<GamePhase>("intro");
   const [patterns, setPatterns] = useState<StabilityPattern[]>(() =>
-    createPatternOrder()
+    createPatternOrder(),
   );
   const [currentPatternIndex, setCurrentPatternIndex] = useState(0);
   const [patternResults, setPatternResults] = useState<PatternResult[]>([]);
@@ -85,7 +101,7 @@ export function TensionControlGame() {
 
   const activePatternIndex = getSafePatternIndex(
     currentPatternIndex,
-    patterns.length
+    patterns.length,
   );
   const currentPattern = patterns[activePatternIndex];
 
@@ -186,7 +202,7 @@ export function TensionControlGame() {
 
     const totalDurationMs = patterns.reduce(
       (sum, pattern) => sum + pattern.durationMs,
-      0
+      0,
     );
 
     const step = (frameTime: number) => {
@@ -194,15 +210,15 @@ export function TensionControlGame() {
       lastFrameRef.current = frameTime;
       const previousTotalElapsed = Math.min(
         frameTime - deltaMs - startTimeRef.current,
-        totalDurationMs
+        totalDurationMs,
       );
       const currentTotalElapsed = Math.min(
         frameTime - startTimeRef.current,
-        totalDurationMs
+        totalDurationMs,
       );
       const nextPatternIndex = getSafePatternIndex(
         Math.floor(currentTotalElapsed / patterns[0].durationMs),
-        patterns.length
+        patterns.length,
       );
 
       if (nextPatternIndex !== currentPatternIndexRef.current) {
@@ -213,16 +229,15 @@ export function TensionControlGame() {
 
       const safePatternIndex = getSafePatternIndex(
         currentPatternIndexRef.current,
-        patterns.length
+        patterns.length,
       );
       currentPatternIndexRef.current = safePatternIndex;
       const activePattern = patterns[safePatternIndex];
-      const segmentStartMs =
-        safePatternIndex * activePattern.durationMs;
+      const segmentStartMs = safePatternIndex * activePattern.durationMs;
       const segmentElapsedMs = currentTotalElapsed - segmentStartMs;
       const previousSegmentElapsedMs = Math.max(
         0,
-        previousTotalElapsed - segmentStartMs
+        previousTotalElapsed - segmentStartMs,
       );
       const deltaSeconds = deltaMs / 1000;
 
@@ -235,7 +250,7 @@ export function TensionControlGame() {
         activePattern,
         segmentElapsedMs,
         positionRef.current,
-        velocityRef.current
+        velocityRef.current,
       );
 
       let nextVelocity =
@@ -244,7 +259,7 @@ export function TensionControlGame() {
         getPatternImpulse(
           activePattern,
           previousSegmentElapsedMs,
-          segmentElapsedMs
+          segmentElapsedMs,
         );
       const maxVelocity = BASE_MAX_VELOCITY * physics.maxVelocityMultiplier;
       nextVelocity = clamp(nextVelocity, -maxVelocity, maxVelocity);
@@ -253,7 +268,7 @@ export function TensionControlGame() {
       const nextPosition = clamp(
         positionRef.current + nextVelocity * deltaSeconds,
         -100,
-        100
+        100,
       );
       const inSafeZone =
         nextPosition >= SAFE_ZONE_MIN && nextPosition <= SAFE_ZONE_MAX;
@@ -278,7 +293,7 @@ export function TensionControlGame() {
       setTimeInZonePercent(
         currentTotalElapsed > 0
           ? (zoneTimeRef.current / currentTotalElapsed) * 100
-          : 0
+          : 0,
       );
       setLiveMaxDrift((current) => Math.max(current, Math.abs(nextPosition)));
       setPosition(nextPosition);
@@ -343,8 +358,7 @@ export function TensionControlGame() {
         overallTimeInSafeZonePercent: finalSummary.overallTimeInSafeZonePercent,
         averageDistanceFromCenter: finalSummary.averageDistanceFromCenter,
         maxDeviation: finalSummary.maxDeviation,
-        averageRecoveryTimeMs:
-          finalSummary.averageRecoveryTimeMs ?? "N/A",
+        averageRecoveryTimeMs: finalSummary.averageRecoveryTimeMs ?? "N/A",
         totalOvercorrectionCount: finalSummary.totalOvercorrectionCount,
         totalPatterns: finalSummary.totalPatterns,
       },
@@ -363,18 +377,20 @@ export function TensionControlGame() {
 
   const totalDurationMs = useMemo(
     () => patterns.reduce((sum, pattern) => sum + pattern.durationMs, 0),
-    [patterns]
+    [patterns],
   );
   const sessionElapsedMs = useMemo(
     () =>
       patterns
         .slice(0, activePatternIndex)
         .reduce((sum, pattern) => sum + pattern.durationMs, 0) + elapsedMs,
-    [activePatternIndex, elapsedMs, patterns]
+    [activePatternIndex, elapsedMs, patterns],
   );
   const sessionTimeRemaining = Math.max(0, totalDurationMs - sessionElapsedMs);
   const sessionProgressPercent =
-    totalDurationMs > 0 ? clamp((sessionElapsedMs / totalDurationMs) * 100, 0, 100) : 0;
+    totalDurationMs > 0
+      ? clamp((sessionElapsedMs / totalDurationMs) * 100, 0, 100)
+      : 0;
   const markerLeftPercent = useMemo(() => (position + 100) / 2, [position]);
   const safeZoneLeftPercent = ((SAFE_ZONE_MIN + 100) / 200) * 100;
   const safeZoneWidthPercent = ((SAFE_ZONE_MAX - SAFE_ZONE_MIN) / 200) * 100;
@@ -402,29 +418,33 @@ export function TensionControlGame() {
     <div className="stability-shell">
       <div className="stability-card">
         <header className="stability-header">
-          {phase === "intro" && <div className="eyebrow">Assessment Protocol</div>}
+          {phase === "intro" && (
+            <div className="eyebrow">Assessment Protocol</div>
+          )}
           {phase === "result" && <div className="eyebrow">Test Complete</div>}
-          <h1>Stability Control Test</h1>
+          <h1>Tension Control Test</h1>
           {phase === "intro" ? (
             <>
               <p>
-                Use &larr; and &rarr; to counter the force and keep the marker near the center.
-                The system will apply six different stability patterns during one
-                continuous session.
+                Use &larr; and &rarr; to counter the force and keep the marker
+                near the center. The system will apply six different stability
+                patterns during one continuous session.
               </p>
               <p className="stability-subtext">
-                This test measures control stability, correction accuracy, and recovery
-                under deterministic disturbance. Each pattern type has fixed behavior;
-                only the order and direction are randomized.
+                This test measures control stability, correction accuracy, and
+                recovery under deterministic disturbance. Each pattern type has
+                fixed behavior; only the order and direction are randomized.
               </p>
             </>
           ) : phase === "playing" ? (
             <p className="gameplay-hint">
-              Keep the marker inside the safe center. Pull left or right to correct any drift.
+              Keep the marker inside the safe center. Pull left or right to
+              correct any drift.
             </p>
           ) : (
             <p className="gameplay-hint">
-              Review your final score and restart to reshuffle the pattern order.
+              Review your final score and restart to reshuffle the pattern
+              order.
             </p>
           )}
         </header>
@@ -445,81 +465,92 @@ export function TensionControlGame() {
           </div>
         )}
 
-        {phase === "playing" && (
-          currentPattern ? (
-          <div className="stability-panel gameplay-panel">
-            <div className="pattern-topline">
-              <div>
-                <div className="stat-label">Session control</div>
-                <h2>Keep Centered</h2>
+        {phase === "playing" &&
+          (currentPattern ? (
+            <div className="stability-panel gameplay-panel">
+              <div className="pattern-topline">
+                <div>
+                  <div className="stat-label">Session control</div>
+                  <h2>Keep Centered</h2>
+                </div>
+                <div className="time-readout">
+                  <span>Time left</span>
+                  <strong>{(sessionTimeRemaining / 1000).toFixed(1)}</strong>
+                </div>
               </div>
-              <div className="time-readout">
-                <span>Time left</span>
-                <strong>{(sessionTimeRemaining / 1000).toFixed(1)}</strong>
+
+              <div className="session-progress" aria-label="Session progress">
+                <span style={{ width: `${sessionProgressPercent}%` }} />
               </div>
-            </div>
 
-            <div className="session-progress" aria-label="Session progress">
-              <span style={{ width: `${sessionProgressPercent}%` }} />
-            </div>
-
-            <div className={`correction-cue ${statusLabel === "Safe" ? "stable" : "drift"}`}>
-              {correctionCue}
-            </div>
-
-            <div className="stability-bar-wrapper">
-              <div className="bar-labels">
-                <span>LEFT DRIFT</span>
-                <strong>SAFE CENTER</strong>
-                <span>RIGHT DRIFT</span>
+              <div
+                className={`correction-cue ${statusLabel === "Safe" ? "stable" : "drift"}`}
+              >
+                {correctionCue}
               </div>
-              <div className="stability-bar" aria-label="Stability meter balance rail">
-                <div className="rail-center-line" />
+
+              <div className="stability-bar-wrapper">
+                <div className="bar-labels">
+                  <span>LEFT DRIFT</span>
+                  <strong>SAFE CENTER</strong>
+                  <span>RIGHT DRIFT</span>
+                </div>
                 <div
-                  className="safe-zone"
-                  style={{
-                    left: `${safeZoneLeftPercent}%`,
-                    width: `${safeZoneWidthPercent}%`,
-                  }}
-                />
-                <div
-                  className="marker"
-                  style={{ left: `${markerLeftPercent}%` }}
-                />
+                  className="stability-bar"
+                  aria-label="Stability meter balance rail"
+                >
+                  <div className="rail-center-line" />
+                  <div
+                    className="safe-zone"
+                    style={{
+                      left: `${safeZoneLeftPercent}%`,
+                      width: `${safeZoneWidthPercent}%`,
+                    }}
+                  />
+                  <div
+                    className="marker"
+                    style={{ left: `${markerLeftPercent}%` }}
+                  />
+                </div>
+                <div className="bar-legend">
+                  <span>-100</span>
+                  <span>position: {position.toFixed(1)}</span>
+                  <span>+100</span>
+                </div>
               </div>
-              <div className="bar-legend">
-                <span>-100</span>
-                <span>position: {position.toFixed(1)}</span>
-                <span>+100</span>
-              </div>
-            </div>
 
-            <div className="control-row">
-              <span>Pull Left</span>
-              <span className={isHoldingLeft ? "key active" : "key"}>&larr;</span>
-              <span className={isHoldingRight ? "key active" : "key"}>&rarr;</span>
-              <span>Pull Right</span>
-            </div>
+              <div className="control-row">
+                <span>Pull Left</span>
+                <span className={isHoldingLeft ? "key active" : "key"}>
+                  &larr;
+                </span>
+                <span className={isHoldingRight ? "key active" : "key"}>
+                  &rarr;
+                </span>
+                <span>Pull Right</span>
+              </div>
 
-            <div className={`state-pill ${statusLabel === "Safe" ? "stable" : "drift"}`}>
-              {statusLabel === "Safe" ? "STABLE" : statusLabel.toUpperCase()}
-            </div>
+              <div
+                className={`state-pill ${statusLabel === "Safe" ? "stable" : "drift"}`}
+              >
+                {statusLabel === "Safe" ? "STABLE" : statusLabel.toUpperCase()}
+              </div>
 
-            <div className="live-metrics">
-              <div className="live-metric">
-                <span>Safe Time</span>
-                <strong>{formatPercent(timeInZonePercent)}</strong>
-              </div>
-              <div className="live-metric">
-                <span>Current Error</span>
-                <strong>{formatNumber(Math.abs(position))}</strong>
-              </div>
-              <div className="live-metric">
-                <span>Max Drift</span>
-                <strong>{formatNumber(liveMaxDrift)}</strong>
+              <div className="live-metrics">
+                <div className="live-metric">
+                  <span>Safe Time</span>
+                  <strong>{formatPercent(timeInZonePercent)}</strong>
+                </div>
+                <div className="live-metric">
+                  <span>Current Error</span>
+                  <strong>{formatNumber(Math.abs(position))}</strong>
+                </div>
+                <div className="live-metric">
+                  <span>Max Drift</span>
+                  <strong>{formatNumber(liveMaxDrift)}</strong>
+                </div>
               </div>
             </div>
-          </div>
           ) : (
             <div className="stability-panel gameplay-panel">
               <div className="pattern-description">
@@ -529,11 +560,12 @@ export function TensionControlGame() {
                 Start Test
               </button>
             </div>
-          )
-        )}
+          ))}
 
         {phase === "result" && summary && (
-          <div className={`stability-panel result-panel ${getScoreTone(summary.score)}`}>
+          <div
+            className={`stability-panel result-panel ${getScoreTone(summary.score)}`}
+          >
             <div className="result-summary">
               <div>
                 <div className="result-title">Overall Score</div>
@@ -544,11 +576,15 @@ export function TensionControlGame() {
             <div className="result-grid">
               <div className="result-item">
                 <span>Safe zone time</span>
-                <strong>{formatPercent(summary.overallTimeInSafeZonePercent)}</strong>
+                <strong>
+                  {formatPercent(summary.overallTimeInSafeZonePercent)}
+                </strong>
               </div>
               <div className="result-item">
                 <span>Average distance</span>
-                <strong>{formatNumber(summary.averageDistanceFromCenter)}</strong>
+                <strong>
+                  {formatNumber(summary.averageDistanceFromCenter)}
+                </strong>
               </div>
               <div className="result-item">
                 <span>Max deviation</span>
@@ -582,7 +618,10 @@ export function TensionControlGame() {
                 </thead>
                 <tbody>
                   {patternResults.map((result) => (
-                    <tr className={getScoreTone(result.patternScore)} key={result.patternId}>
+                    <tr
+                      className={getScoreTone(result.patternScore)}
+                      key={result.patternId}
+                    >
                       <td>{result.patternName}</td>
                       <td>{result.patternScore}</td>
                       <td>{formatPercent(result.timeInSafeZonePercent)}</td>
