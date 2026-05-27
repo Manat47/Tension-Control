@@ -121,14 +121,14 @@ left -> right = +1 overcorrection right -> left = +1 overcorrection
 Pattern Score Formula
 แต่ละ pattern จะถูกคำนวณคะแนนแยกกัน
 
-``
+```
 patternScore =
 timeInSafeZonePercent * 0.4
 
 distanceScore * 0.3
 recoveryScore * 0.2
 overcorrectionScore * 0.1
-``
+```
 น้ำหนักคะแนนคือ:
 
 Time in Safe Zone 40% Average Distance 30% Recovery Time 20% Overcorrection Count 10%
