@@ -7,7 +7,7 @@ No matter what happens, pull the marker back to the center.
 ```
 ระหว่างเล่น ผู้เล่นไม่จำเป็นต้องรู้ว่าเกมกำลังใช้ pattern อะไรอยู่ เพราะสิ่งที่ต้องการวัดคือการตอบสนองต่อการเสียสมดุล ไม่ใช่การจำด่านหรือจำรูปแบบแรงรบกวน
 
-##Gameplay
+## Gameplay
 ผู้เล่นควบคุม marker บน stability bar แนวนอน
 
 - จุดกึ่งกลางคือ Safe Zone
@@ -18,7 +18,7 @@ Controls:
 
 Pull Left [←] [→] Pull Right
 
-##Core Physics
+## Core Physics
 ระบบฟิสิกส์ของเกมใช้แนวคิดง่าย ๆ คือรวมแรงจากผู้เล่นกับแรงรบกวนของระบบ
 ```text
 totalForce = playerInputForce + patternDisturbanceForce
@@ -33,28 +33,28 @@ velocity += totalForce * deltaTime velocity *= damping position += velocity * de
 Safe Zone อยู่ใกล้ตำแหน่งกึ่งกลาง:
 -5 to +5
 
-##Disturbance Patterns
+## Disturbance Patterns
 เกมมี disturbance patterns หลายรูปแบบ แต่ pattern เหล่านี้จะถูกซ่อนไว้ระหว่างเล่น เพื่อให้ผู้เล่นโฟกัสกับการดึง marker กลับเข้ากลางเท่านั้น
 
-###Kick
+### Kick
 Kick เป็นแรงกระแทกที่ผลัก marker ออกจาก center อย่างรุนแรง หลังจากนั้น rail จะรู้สึกหนัก ทำให้การดึง marker กลับเข้ากลางต้องใช้การกดค้างนานขึ้น
 
-###Constant Pull
+### Constant Pull
 Constant Pull เป็นแรงดึงต่อเนื่องไปทางใดทางหนึ่ง ผู้เล่นต้องกดต้านแรงดึงนั้น และต้องระวังไม่ให้ดึงแรงเกินจนเกิด overcorrection
 
-###Wave Pull
+### Wave Pull
 Wave Pull เป็นแรงแบบ sine wave ที่ส่าย marker ไปทางซ้ายและขวา ผู้เล่นต้องปรับการกดตามจังหวะของแรงรบกวน
 
-###Slippery
+### Slippery
 Slippery ทำให้การควบคุมไวและลื่นขึ้น การกดเพียงเล็กน้อยสามารถทำให้ marker เคลื่อนที่มากกว่าปกติ จึงเสี่ยงต่อการแก้แรงเกิน
 
-###Momentum
+### Momentum
 Momentum ทำให้ marker มีแรงเฉื่อยสูง เมื่อ marker เริ่มเคลื่อนที่ มันจะยังไหลต่อแม้ผู้เล่นปล่อยปุ่ม ผู้เล่นจึงต้องกดสวนเพื่อเบรก
 
-###Wind Burst
+### Wind Burst
 Wind Burst เป็นแรงลมที่พัดเข้ามาเป็นระลอก ผู้เล่นต้อง recover marker กลับเข้ากลางระหว่างแต่ละ gust
 
-##Fairness
+## Fairness
 เกมนี้ออกแบบให้ fair ระหว่างผู้เล่น
 
 ระบบสุ่มเฉพาะ:
@@ -78,35 +78,35 @@ distanceFromCenter = Math.abs(position)
 ```
 ดังนั้นการหลุดไปทางซ้ายหรือขวาจะถูกคิดคะแนนเท่ากัน
 
-##Scoring Metrics
+## Scoring Metrics
 ระบบคะแนนไม่ได้วัดแค่ว่าผู้เล่นชนะหรือแพ้ แต่วัดจากหลาย metrics ที่สะท้อนการควบคุมเสถียรภาพ
 
-###Time in Safe Zone
+### Time in Safe Zone
 วัดว่าผู้เล่นรักษา marker ให้อยู่ใน Safe Zone ได้นานแค่ไหน
 timeInSafeZonePercent = (timeInZoneMs / durationMs) * 100
 Average Distance from Center
 วัดว่าโดยเฉลี่ย marker อยู่ห่างจาก center เท่าไหร่
 
-###averageDistanceFromCenter = distanceSum / sampleCount
+### averageDistanceFromCenter = distanceSum / sampleCount
 
-###Max Deviation
+### Max Deviation
 วัดว่า marker หลุดออกจาก center ไกลที่สุดเท่าไหร่
 maxDeviation = max(distanceFromCenter)
 
-###Recovery Time
+### Recovery Time
 วัดว่าหลังจาก marker หลุดออกไปไกล ผู้เล่นใช้เวลานานแค่ไหนในการดึงกลับเข้า Safe Zone
 ระบบถือว่า major drift เริ่มต้นเมื่อ:
 distanceFromCenter >= 20
 สูตร recovery time คือ:
 recoveryTimeMs = timeReturnedToSafeZone - timeMajorDriftStarted
 
-###Overcorrection Count
+### Overcorrection Count
 วัดจำนวนครั้งที่ผู้เล่นแก้แรงเกินจน marker ข้ามจากฝั่งหนึ่งไปอีกฝั่งหนึ่ง
 
 ตัวอย่าง:
 left -> right = +1 overcorrection right -> left = +1 overcorrection
 
-##Pattern Score Formula
+## Pattern Score Formula
 แต่ละ pattern จะถูกคำนวณคะแนนแยกกัน
 
 ```text
@@ -120,13 +120,13 @@ overcorrectionScore * 0.1
 น้ำหนักคะแนนคือ:
 Time in Safe Zone 40% Average Distance 30% Recovery Time 20% Overcorrection Count 10%
 
-##Overall Score
+## Overall Score
 เมื่อเล่นครบทุก pattern ระบบจะนำคะแนนของแต่ละ pattern มาเฉลี่ยเป็นคะแนนรวม
 overallScore = sum(patternScores) / numberOfPatterns
 Result Screen
 หลังจบเกม ผู้เล่นจะเห็นผลลัพธ์รวมและรายละเอียดของแต่ละ pattern
 
-##Result screen แสดงข้อมูลหลักดังนี้:
+## Result screen แสดงข้อมูลหลักดังนี้:
 Overall Score
 Overall Time in Safe Zone
 Average Distance from Center
@@ -136,7 +136,7 @@ Total Overcorrections
 Pattern-by-pattern performance table
 ระหว่างเล่น ผู้เล่นจะไม่เห็นชื่อ pattern เพื่อให้โฟกัสกับการควบคุม marker แต่หลังจบเกมสามารถดูได้ว่า performance ของแต่ละ segment เป็นอย่างไร
 
-##What This Game Measures
+## What This Game Measures
 เกมนี้วัดทักษะการควบคุมเสถียรภาพภายใต้แรงรบกวน
 ในเชิงเปรียบเทียบกับ software development marker สามารถแทนสถานะของระบบ ส่วนผู้เล่นทำหน้าที่เหมือน developer หรือ operator ที่ต้องรักษาระบบให้อยู่ในสภาวะ stable
 
